@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Reald/Orm
+ * 
+ * Orm
+ * 
+ * OR mapping for database operations dedicated to the web framework "Reald".
+ * 
+ * Author : Masato Nakatsuji.
+ * Since  : 2023,03.24
+ */
 namespace Reald\Orm;
 
 use PDO;
@@ -39,6 +49,7 @@ class Orm{
 
      * @param $drivename Connection name of the connection destination database
      * @param $option = [] Database connection destination information
+     * @return $this 
      */
     public function setDatabase($driveName, $option = []){
         
@@ -51,10 +62,28 @@ class Orm{
         return $this;
     }
 
+    /**
+     * query
+     * 
+     * Method used to send SQL requests directly to the database.
+     * Returns a PDOStatment object similar to PDO::query.
+     * 
+     * @param $sql SQL code to send.
+     * @param $bind = [] Value to bind (specified by array value)
+     * @return PDOStatement PDOStatement object
+     */
     public function query($sql, $bind = []){
         return OrmStatic::query($this->drive, $sql, $bind);
     }
 
+    /**
+     * queryConvert
+     * 
+     * Methods to get results from PDOStatement objects.
+     * 
+     * @param $std PDOStatement object
+     * @return Array Listed results from a PDOStatement object
+     */
     public function queryConvert($std){
         $res = [];
         while($row = $std->fetch(PDO::FETCH_OBJ)){
@@ -63,12 +92,27 @@ class Orm{
         return $res;
     }
 
+    /**
+     * log
+     * 
+     * Prints a log of all SQL requests.
+     * @return Array SQL send log list
+     */
     public function log(){
         return OrmStatic::log();
     }
 
+    /**
+     * select
+     * 
+     * Methods for retrieving table records
+     * OrmSelect object is returned as a return value.
+     * @param Array $option = null If the acquisition target column is specified, specify it with an array value
+     * @return OrmSelect OrmSelect Object
+     */
     public function select($option = null){
         
+        // OrmSelect class instance
         $ormSelect = new OrmSelect($this, $this->tableName);
 
         if($option){
@@ -79,6 +123,14 @@ class Orm{
         }
     }
 
+    /**
+     * database
+     * 
+     * Methods for performing database operations
+     * Returns OrmMigrateDatabase object as return value
+     * @param String $database database name
+     * @return OrmMigrateDatabase 
+     */
     public function database($database){
         return new OrmMigrateDatabase($this, $database);
     }
