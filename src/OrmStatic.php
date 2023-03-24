@@ -35,6 +35,21 @@ class OrmStatic{
     private static $_log = [];
 
     /**
+     * existDriver
+     * 
+     * @param String $driveName
+     * @return Boolean 
+     */
+    public static function existDriver($driveName){
+
+        if(empty(self::$_pdo[$driveName])){
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * addConnect
      * 
      * Create a database attached drive.
@@ -42,19 +57,19 @@ class OrmStatic{
      * @param String $drivename connection drive name
      * @param Array $option connection data
      */
-    public static function addConnect($drivename, $option){
+    public static function addConnect($driveName, $option){
 
         if($option["driver"] == "mysql"){
-            self::$_pdo[$drivename] = OrmMySql::connect($option);
+            self::$_pdo[$driveName] = OrmMySql::connect($option);
         }
         else if($option["driver"] == "sqlite"){
-            self::$_pdo[$drivename]  = OrmSqLite::connect($option);
+            self::$_pdo[$driveName]  = OrmSqLite::connect($option);
         }
         else if($option["driver"] == "pgsql"){
-            self::$_pdo[$drivename]  = OrmPgSql::connect($option);    
+            self::$_pdo[$driveName]  = OrmPgSql::connect($option);    
         }
         else if($option["driver"] == "oracle"){
-            self::$_pdo[$drivename]  = OrmOracle::connect($option);
+            self::$_pdo[$driveName]  = OrmOracle::connect($option);
         }
     }
 

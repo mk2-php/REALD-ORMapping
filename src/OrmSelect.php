@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * ==============================================================================
+ * 
+ * Reald/Orm
+ * 
+ * OrmSelect
+ * 
+ * OR mapping for database operations dedicated to the web framework "Reald".
+ * Class for extracting record information from table.
+ * 
+ * Author : Masato Nakatsuji.
+ * Since  : 2023,03.24
+ * 
+ * ==============================================================================
+ */
+
 namespace Reald\Orm;
 
 use PDO;
@@ -11,11 +27,30 @@ class OrmSelect{
     private $_bind = [];
     private $_paging = null;
 
+    /**
+     * __construct
+     * 
+     * Constructor for OrmMigrateView class.
+     * 
+     * @param Orm &$context Orm class as context
+     * @param String $tableName table name
+     */
     public function __construct(&$context, $tableName){
         $this->context = $context;
         $this->_table = $tableName;
     }
 
+    /**
+     * where
+     * 
+     * Method for specifying record extraction conditions
+     * 
+     * @param String $column Condition column name
+     * @param String $operand operator
+     * @param String $value conditional value
+     * @param String $join Logical operators with other conditions (AND/OR)
+     * @return OrmSelect $this
+     */
     public function where($column, $operand, $value, $join = "AND"){
 
         $this->_query[] = [
@@ -29,6 +64,15 @@ class OrmSelect{
         return $this;
     }
 
+    /**
+     * whereRaw
+     * 
+     * Raw with record extraction condition specification.
+     * 
+     * @param String $raw SQL conditional statemen(raw
+     * @param String $join Logical operators with other conditions (AND/OR)
+     * @return OrmSelect $this
+     */
     public function whereRaw($raw, $join = "AND"){
 
         $this->_query[] = [
@@ -40,10 +84,32 @@ class OrmSelect{
         return $this;
     }
 
+    /**
+     * whereOr
+     * 
+     * Method for specifying record extraction conditions
+     * Combine with other condition with OR condition
+     * 
+     * @param String $column Condition column name
+     * @param String $operand operator
+     * @param String $value conditional value
+     * @return OrmSelect $this
+     */
     public function whereOr($column, $operand, $value){
         return $this->where($column, $operand, $value, "OR");
     }
 
+
+    /**
+     * whereIn
+     * 
+     * Multi-value condition specification using IN clause.
+     * 
+     * @param String $column Condition column name
+     * @param String $values Condition value (specified by array value)
+     * @param String $join Logical operators with other conditions (AND/OR)
+     * @return OrmSelect $this
+     */
     public function whereIn($column, $values, $join = "AND"){
 
         $this->_query[] = [
@@ -56,6 +122,15 @@ class OrmSelect{
         return $this;
     }
 
+    /**
+     * select
+     * 
+     * Methods for Enumeration of Extraction Columns
+     * Used for output by partial extraction or CASE statement instead of all columns
+     * 
+     * @param Array $fiels Output columns (specified in an array)
+     * @return OrmSelect $this
+     */
     public function select($fields){
         $this->_query[] = [
             "type" => "select",
