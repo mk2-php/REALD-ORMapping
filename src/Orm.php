@@ -1,6 +1,6 @@
 <?php
 
-namespace REALD\ORMapping;
+namespace Reald\Orm;
 
 use PDO;
 
@@ -10,17 +10,44 @@ class Orm{
     public $_pdo;
     public $drive = "normal";
 
+    public $createDateColumn = null;
+    public $updateDateColumn = null;
+
+    /**
+     * __construct
+     * 
+     * Constructor for Orm class.
+     * If you specify the argument $option, it becomes an independent connection destination.
+     * 
+     * @param $option = null Destination database information
+     */
     public function __construct($option = null){
 
-        if(!$option){
-            return;
+        if($option){
+            $this->drive = hash("sha256", uniqId().date("YmdHis"));
+            $this->setDatabase($this->drive, $option);
         }
 
-        $this->setDatabase($option);
     }
 
+    /**
+     * setDatabase
+
+     * This is a method to change the connection destination of the database.
+     * If you do not specify the argument $option, 
+     * it will switch to the already established connection destination
+
+     * @param $drivename Connection name of the connection destination database
+     * @param $option = [] Database connection destination information
+     */
     public function setDatabase($driveName, $option = []){
-        OrmStatic::addConnect($driveName, $option);
+        
+        if($option){
+            OrmStatic::addConnect($driveName, $option);
+        }
+
+        $this->drive = $driveName;
+
         return $this;
     }
 

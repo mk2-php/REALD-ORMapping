@@ -1,6 +1,6 @@
 <?php
 
-namespace REALD\ORMapping;
+namespace Reald\Orm;
 
 class OrmMigrateDatabase{
 
@@ -63,6 +63,26 @@ class OrmMigrateDatabase{
         $this->context->query($sql);
 
         return $this;
+    }
+
+    public function exists(){
+
+        $sql = "show databases;";
+
+        $std = $this->context->query($sql);
+
+        $res = $this->context->queryConvert($std);
+
+        $exists = false;
+        
+        foreach($res as $r_){
+            if($r_->Database == $this->_database){
+                $exists = true;
+                break;
+            }
+        }
+
+        return $exists;
     }
 
     public function show($ifNotExistsFlg = false){

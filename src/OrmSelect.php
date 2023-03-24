@@ -1,6 +1,6 @@
 <?php
 
-namespace REALD\ORMapping;
+namespace Reald\Orm;
 
 use PDO;
 
@@ -9,6 +9,7 @@ class OrmSelect{
     private $_table;
     private $_query = [];
     private $_bind = [];
+    private $_paging = null;
 
     public function __construct(&$context, $tableName){
         $this->context = $context;
@@ -22,6 +23,17 @@ class OrmSelect{
             "column"=>$column,
             "operand"=>$operand,
             "value"=>$value,
+            "join"=>$join,
+        ];
+
+        return $this;
+    }
+
+    public function whereRaw($raw, $join = "AND"){
+
+        $this->_query[] = [
+            "type"=>"whereraw",
+            "raw"=>$raw,
             "join"=>$join,
         ];
 
@@ -64,25 +76,15 @@ class OrmSelect{
         return $this;
     }
 
-    public function limit($index){
+    public function limit($limit, $offset = null){
 
         $this->_query[] = [
             "type" => "limit",
-            "limit" => $index,
+            "limit" => $limit,
+            "offset" => $offset,
         ];
 
         return $this;
-    }
-
-    public function page($pageCount, $index){
-
-        $this->_query[] = [
-            "type" => "page",
-            "pageCount" => $pageCount,
-            "index"=>$index,
-        ];
-
-        return $this;        
     }
 
     public function join($tableName, $callback){
@@ -161,6 +163,14 @@ class OrmSelect{
                 $where .= $q_["column"] ." ". $q_["operand"] . " ?";
                 $this->_bind[] = $q_["value"];
             }
+            else if($q_["type"] == "whereraw"){
+
+                if($where != ""){
+                    $where .= " " . $q_["join"] . " ";
+                }
+
+                $where .= $q_["raw"];
+            }
             else if($q_["type"] == "wherein"){
 
                 if($where != ""){
@@ -186,10 +196,9 @@ class OrmSelect{
             }
             else if($q_["type"] == "limit"){
                 $limit = $q_["limit"];
-            }
-            else if($q_["type"] == "page"){
-                $offset = ($q_["pageCount"] * ($q_["limit"] - 1));
-                $limit = $q_["pageCount"];
+                if($q_["offset"]){
+                    $offset = $q_["offset"];
+                }
             }
             else if(
                 $q_["type"] == "join" || 
@@ -210,6 +219,12 @@ class OrmSelect{
                 }
 
                 $join .= " ". $joinMode . " JOIN " . $q_["tableName"] ." ON ". $joinSelect->toSql();
+
+                $_bind = $joinSelect->toBind();
+
+                foreach($_bind as $b_){
+                    $this->_bind[] = $b_;
+                }
             }
             else if($q_["type"] == "union"){
                 $union = $q_["ormObject"]->toSql();
@@ -263,10 +278,35 @@ class OrmSelect{
             $res->put($row, $first);
         }
 
+        if($this->_paging){
+            $res->putPaging($this->_paging);
+        }
+
         // bind reset
         $this->_bind = [];
 
         return $res;
+    }
+
+    public function paginate($pageCount, $pageIndex){
+
+        $totalCount = $this->count();
+
+        $this->_deleteLastQuery();
+        $this->_deleteLastQuery();
+
+        $this->limit($pageCount, $pageCount * ($pageIndex - 1));
+
+        $res = $this->get();
+
+        $res->putTotalPage(ceil($totalCount/$pageCount));
+
+        return $res;
+    }
+
+    private function _deleteLastQuery(){
+        unset($this->_query[count($this->_query)-1]);
+        return $this;   
     }
 
     public function first(){   
@@ -365,7 +405,9 @@ class OrmSelectJoin{
                     $where .= $q_["column"] ." ". $q_["operand"] . " ?";
                 }
                 
-                $this->_bind[] = $q_["value"];
+                if($q_["type"] == "where"){
+                    $this->_bind[] = $q_["value"];
+                }
             }
             else if($q_["type"] == "wherein"){
 
@@ -389,4 +431,7 @@ class OrmSelectJoin{
         return $where;
     }
 
+    public function toBind(){
+        return $this->_bind;
+    }
 }

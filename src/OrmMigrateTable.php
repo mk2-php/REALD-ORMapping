@@ -1,6 +1,6 @@
 <?php
 
-namespace REALD\ORMapping;
+namespace Reald\Orm;
 
 class OrmMigrateTable{
 
@@ -216,5 +216,9 @@ class OrmMigrateTable{
 
     public function insert($option = null){
         return $this->context->insert($option);
+    }
+
+    public function update(){
+        return $this->context->update();
     }
 }

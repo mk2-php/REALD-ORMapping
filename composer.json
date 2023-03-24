@@ -1,8 +1,8 @@
 {
-    "name": "reald/ormapping",
+    "name": "reald/orm",
     "autoload": {
         "psr-4": {
-            "REALD\\ORMapping\\": "src/"
+            "Reald\\Orm\\": "src/"
         }
     }
 }

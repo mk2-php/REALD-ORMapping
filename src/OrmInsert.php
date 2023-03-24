@@ -1,6 +1,6 @@
 <?php
 
-namespace REALD\ORMapping;
+namespace Reald\Orm;
 
 class OrmInsert{
 
@@ -32,6 +32,28 @@ class OrmInsert{
 
             $ind++;
         }   
+
+        $nowDate = Date("Y/m/d H:i:s");
+
+        if($this->context->createDateColumn){
+            if($ind){
+                $columns .= ",";
+                $values .= ",";
+            }
+            $columns .= $this->context->createDateColumn;
+            $values .= "?";
+            $bind[] = $nowDate;
+        }
+
+        if($this->context->updateDateColumn){
+            if($ind){
+                $columns .= ",";
+                $values .= ",";
+            }
+            $columns .= $this->context->updateDateColumn;
+            $values .= "?";
+            $bind[] = $nowDate;
+        }
 
         $sql = "INSERT INTO ". $this->_table. "(" . $columns .") VALUES (" . $values .")";
 

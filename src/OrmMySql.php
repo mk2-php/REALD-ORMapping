@@ -1,6 +1,6 @@
 <?php
 
-namespace REALD\ORMapping;
+namespace Reald\Orm;
 
 use PDO;
 
@@ -76,7 +76,7 @@ class OrmMySql{
         }
 
         if(!empty($option["table"])){
-            $context->_table = $option["table"];
+            $context->tableName = $option["table"];
         }
 
 		return $makePdo;

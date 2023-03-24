@@ -1,6 +1,6 @@
 <?php
 
-namespace REALD\ORMapping;
+namespace Reald\Orm;
 
 class OrmUpdate{
 
@@ -53,10 +53,20 @@ class OrmUpdate{
                 $updateSqlStr .= ",";
             }
 
-            $updateSqlStr .= $column . "=?";
+            $updateSqlStr .= $column . "= ?";
 
             $bind[] = $value;
             $ind++;
+        }
+
+        if($this->context->updateDateColumn){
+
+            if($ind){
+                $updateSqlStr .= ",";
+            }
+
+            $updateSqlStr .= $this->context->updateDateColumn . "= ?";
+            $bind[] = Date("Y/m/d H:i:s");
         }
 
         $where = "";
