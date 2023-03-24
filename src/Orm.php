@@ -108,11 +108,11 @@ class Orm{
      * Methods for retrieving table records
      * OrmSelect object is returned as a return value.
      * @param Array $option = null If the acquisition target column is specified, specify it with an array value
-     * @return OrmSelect OrmSelect Object
+     * @return OrmSelect OrmSelect Class Object
      */
     public function select($option = null){
         
-        // OrmSelect class instance
+        // OrmSelect class object initialization
         $ormSelect = new OrmSelect($this, $this->tableName);
 
         if($option){
@@ -129,23 +129,48 @@ class Orm{
      * Methods for performing database operations
      * Returns OrmMigrateDatabase object as return value
      * @param String $database database name
-     * @return OrmMigrateDatabase 
+     * @return OrmMigrateDatabase OrmMigrateDatabase Class Object
      */
     public function database($database){
+        // OrmMIgrateDatabase class object initialization
         return new OrmMigrateDatabase($this, $database);
     }
 
+    /**
+     * table
+     * 
+     * Methods for performing table operations.(create, alter, drop ete)
+     * Returns OrmMigrateTable class object as return value
+     * 
+     * @param String $tableName = null table name(Use default table name if not specified)
+     * @return OrmMigrateTable OrmMigrateTable Class Object
+     */
     public function table($tableName = null){
+
         if($tableName){
             $this->tableName = $tableName;
         }
+
+        // ormMigrateTable class object initialization
         return new ormMigrateTable($this, $tableName);
     }
 
+    /**
+     * view
+     * 
+     * @param String $viewName
+     * @return OrmMigrateView OrmMigrateView Class Object
+     */
     public function view($viewName){
         return new ormMigrateView($this, $viewName);
     }
 
+    /**
+     * insert
+     * 
+     * @param Array $option = null Data to record
+     * @return OrmInsert OrmInsert Class Object
+     */
     public function insert($option = null){
         $ormInsert = new OrmInsert($this, $this->tableName);
         
