@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * ==============================================================================
+ * 
  * Reald/Orm
  * 
  * Orm
@@ -9,8 +11,21 @@
  * 
  * Author : Masato Nakatsuji.
  * Since  : 2023,03.24
+ * 
+ * ==============================================================================
  */
+
 namespace Reald\Orm;
+
+// require if you didn't use a package management tool such as "commposer".
+require_once "OrmStatic.php";
+require_once "OrmSelect.php";
+require_once "OrmMigrateDatabase.php";
+require_once "OrmMigrateTable.php";
+require_once "OrmMigrateView.php";
+require_once "OrmInsert.php";
+require_once "OrmUpdate.php";
+require_once "OrmResCollection.php";
 
 use PDO;
 
@@ -152,21 +167,27 @@ class Orm{
         }
 
         // ormMigrateTable class object initialization
-        return new ormMigrateTable($this, $tableName);
+        return new OrmMigrateTable($this, $tableName);
     }
 
     /**
      * view
      * 
+     * Methods for database view management.
+     * Returns OrmMigrateView class object as return value
+     * 
      * @param String $viewName
      * @return OrmMigrateView OrmMigrateView Class Object
      */
     public function view($viewName){
-        return new ormMigrateView($this, $viewName);
+        return new OrmMigrateView($this, $viewName);
     }
 
     /**
      * insert
+     * 
+     * Method for registering records to the table
+     * Returns OrmInsert class object as return value
      * 
      * @param Array $option = null Data to record
      * @return OrmInsert OrmInsert Class Object
@@ -182,24 +203,51 @@ class Orm{
         }
     }
 
+    /**
+     * update
+     * 
+     * A method for updating records to the database table
+     * Returns OrmUpdate class object as return value
+     * @return OrmUpdate OrmUpdate Class Object
+     */
     public function update(){
         $ormUpdate = new OrmUpdate($this, $this->tableName);
         return $ormUpdate;
     }
 
+    /**
+     * begin
+     * 
+     * Start a transaction.
+     * Transaction starts are queued for all connected drivers using realdOrm.
+     * @return $this
+     */
     public function begin(){
         OrmStatic::transaction(OrmStatic::TRANSACTION_BEGIN);
         return $this;
     }
 
+    /**
+     * commit
+     * 
+     * Commit a transaction.
+     * Transaction commit are queued for all connected drivers using realdOrm.
+     * @return $this
+     */
     public function commit(){
         OrmStatic::transaction(OrmStatic::TRANSACTION_COMMIT);
         return $this;
     }
 
+    /**
+     * rollback
+     * 
+     * Rollback a transaction.
+     * Transaction rollback are queued for all connected drivers using realdOrm.
+     * @return $this
+     */
     public function rollback(){
         OrmStatic::transaction(OrmStatic::TRANSACTION_ROLLBACK);
         return $this;
     }
-
 }

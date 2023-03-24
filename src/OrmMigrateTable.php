@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * ==============================================================================
+ * 
+ * Reald/Orm
+ * 
+ * OrmMigrateTable
+ * 
+ * OR mapping for database operations dedicated to the web framework "Reald".
+ * A class for adding database tables, updating columns, deleting, etc.
+ * 
+ * Author : Masato Nakatsuji.
+ * Since  : 2023,03.24
+ * 
+ * ==============================================================================
+ */
+
 namespace Reald\Orm;
 
 class OrmMigrateTable{
@@ -7,11 +23,28 @@ class OrmMigrateTable{
     private $context;
     private $_table;
 
+    /**
+     * __construct
+     * 
+     * Constructor for OrmMigrateTable class.
+     * 
+     * @param Orm &$context Orm class as context
+     * @param String $tablename Table name
+     */
     public function __construct(&$context, $tableName){
         $this->context = $context;
         $this->_table = $tableName;
     }
 
+    /**
+     * create
+     * 
+     * Methods for creating database tables.
+     * 
+     * @param Array $option Create table setting column information
+     * @param Array $tableOpt Build table configuration option information
+     * @return $this
+     */
     public function create($option = [], $tableOpt = []){
 
         $ifNotExists = "";
@@ -84,6 +117,14 @@ class OrmMigrateTable{
         return $this;
     }
 
+    /**
+     * addColumn
+     * 
+     * Method for adding columns to the target table.
+     * 
+     * @param Array $option Additional column information to the target table.
+     * @return OrmMigrateTable $this
+     */
     public function addColumn($option = []){
 
         $columOptionStr = "";
@@ -114,7 +155,14 @@ class OrmMigrateTable{
         return $this;
     }
 
-    
+    /**
+     * changeColumn
+     * 
+     * Method to change the column information of the target table.
+     * 
+     * @param Array $option Modified column information of the target table
+     * @return OrmMIgrateTable $this
+     */
     public function changeColumn($option = []){
 
         $columOptionStr = "";
@@ -144,6 +192,14 @@ class OrmMigrateTable{
 
     }
 
+    /**
+     * dropColumn
+     * 
+     * Method information for deleting the column information of the target table.
+     * 
+     * @param Array $optionDeleted column information of the target table
+     * @return OrmMigrateTable $this
+     */
     public function dropColumn($option = []){
 
         $delColumStr = "";
@@ -167,6 +223,13 @@ class OrmMigrateTable{
 
     }
 
+    /**
+     * _setColumn
+     * SQL generation of column information
+     * @param String $column column name
+     * @param Array $option Column information
+     * @return String SQL statement for the column
+     */
     private function _setColumn($column, $option){
 
         $buffStr = $column . " ";
@@ -197,8 +260,14 @@ class OrmMigrateTable{
         return $buffStr;
     }
 
-
-
+    /**
+     * drop
+     * 
+     * Methods for deleting database tables
+     * 
+     * @param Boolean $ifExistsFlg Flag for adding "IF EXISTS" statement
+     * @return OrmMigrateTable $this
+     */
     public function drop($ifExistsFlg = false){
 
         $ifExists = "";
@@ -214,10 +283,28 @@ class OrmMigrateTable{
         return $this;
     }
 
+    /**
+     * insert
+     * 
+     * Method for registering records to the database table.
+     * Wrapper function for insert method of ORM class.
+     * 
+     * @param Array $option Record registration information
+     * @return OrmInsert OrmInsert Class Object
+     */
     public function insert($option = null){
         return $this->context->insert($option);
     }
 
+    /**
+     * update
+     * 
+     * Methods for updating database table records.
+     * Wrapper function for update method of ORM class.
+     * 
+     * @param Array $option Update registration information
+     * @return OrmUpdate OrmUpdate Class Object
+     */
     public function update(){
         return $this->context->update();
     }

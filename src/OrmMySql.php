@@ -1,11 +1,35 @@
 <?php
 
+/**
+ * ==============================================================================
+ * 
+ * Reald/Orm
+ * 
+ * OrmMySql
+ * 
+ * OR mapping for database operations dedicated to the web framework "Reald".
+ * Database connection handling class for MySQL
+ * 
+ * Author : Masato Nakatsuji.
+ * Since  : 2023,03.24
+ * 
+ * ==============================================================================
+ */
+
 namespace Reald\Orm;
 
 use PDO;
 
 class OrmMySql{
 
+	/**
+	 * connect
+	 * 
+	 * Database connection handling method
+	 * 
+	 * @param Array $option
+	 * @return PDO PDO Object
+	 */
     public static function connect($option){
 
 		$host = "127.0.0.1";

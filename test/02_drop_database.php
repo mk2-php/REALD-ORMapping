@@ -1,15 +1,6 @@
 <?php
 
 require "../src/Orm.php";
-require "../src/OrmStatic.php";
-require "../src/OrmMySql.php";
-require "../src/OrmSelect.php";
-require "../src/OrmResCollection.php";
-require "../src/OrmMigrateDatabase.php";
-require "../src/OrmMigrateTable.php";
-require "../src/OrmMigrateView.php";
-require "../src/OrmInsert.php";
-require "../src/OrmUpdate.php";
 
 use Reald\Orm\Orm;
 
