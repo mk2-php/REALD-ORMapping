@@ -261,4 +261,64 @@ trait OrmTrait{
         return $this;
     }
 
+    /**
+     * handleSelectBefore
+     * 
+     * This handler is executed before the record retrieval process starts
+     * By overriding this handler, you can insert a callback before the acquisition process.
+     * 
+     * @param OrmSelect $std OrmSelect Class Object
+     * @return void
+     */
+    public function handleSelectBefore($std){}
+
+    /**
+     * handleSelectAfter
+     * 
+     * This handler is executed after the record retrieval process starts
+     * By overriding this handler, you can insert a callback after the acquisition process.
+     * * If the OrmResCollection class object of the argument is returned as 
+     *   the return value, the returned content will be the actual output result.
+     * 
+     * @param OrmResCollection $response OrmResCollection Class Object
+     * @return void
+     */
+    public function handleSelectAfter($response){}
+
+    /**
+     * handleInsertBefore
+     * 
+     * 
+     * 
+     * @param Array $insertData insert data
+     * @return void
+     */
+    public function handleInsertBefore($insertData){}
+    
+    /**
+     * handleInsertAfter
+     * 
+     * @param OrmInsert OrmInsert class object
+     * @return void
+     */
+    public function handleInsertAfter($std){}
+
+    /**
+     * handleUpdateBefore
+     * 
+     * 
+     * @param Array $oupdateData update data
+     * @return void
+     */
+    public function handleUpdateBefore($updateData){}
+
+    /**
+     * handleUpdateAfter
+     * 
+     * 
+     * @param OrmUpdate OrmUpdate Class Object
+     * @return void
+     */
+    public function handleUpdateAfter($std){}
+
 }

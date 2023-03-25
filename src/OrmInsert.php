@@ -46,10 +46,18 @@ class OrmInsert{
      */
     public function insert($insertData){
 
+        // Execution of pre-record handler
+        $buff = $this->context->handleInsertBefore($insertData);
+        if($buff){
+            // Overwrite the response if there is a return value from the handler
+            $insertData = $buff;
+        }
+
         $bind = [];
         $columns = "";
         $values = "";
         $ind = 0;
+
         foreach($insertData as $column => $value){
 
             if($ind){
@@ -89,7 +97,10 @@ class OrmInsert{
 
         $sql = "INSERT INTO ". $this->_table. "(" . $columns .") VALUES (" . $values .")";
 
-        $this->context->query($sql, $bind);
+        $res = $this->context->query($sql, $bind);
+
+        // Execution of handler after record registration is completed
+        $this->context->handleInsertAfter($this);
 
         return $this;
     }
@@ -104,5 +115,5 @@ class OrmInsert{
      */
     public function lastInsertId(){
         return $this->context->_pdo->lastInsertId();
-    }    
+    }
 }

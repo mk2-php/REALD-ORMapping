@@ -18,5 +18,6 @@
 namespace Reald\Orm;
 
 class Orm{
+    // Lateral expansion from OrmTrait
     use OrmTrait;
 }

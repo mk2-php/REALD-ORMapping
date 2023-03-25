@@ -113,6 +113,33 @@ class OrmStatic{
     }
 
     /**
+     * begin
+     * 
+     * start transaction
+     */
+    public static function begin(){
+        self::transaction(self::TRANSACTION_BEGIN);
+    }
+
+    /**
+     * commit
+     * 
+     * commit transaction
+     */
+    public static function commit(){
+        self::transaction(self::TRANSACTION_COMMIT);
+    }
+
+    /**
+     * rollback
+     * 
+     * rollback transaction
+     */
+    public static function rollback(){
+        self::transaction(self::TRANSACTION_ROLLBACK);
+    }
+
+    /**
      * getConnect
      * 
      * Switch destination database by drive

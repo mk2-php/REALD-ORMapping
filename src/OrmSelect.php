@@ -140,6 +140,16 @@ class OrmSelect{
         return $this;
     }
     
+    /**
+     * orderBy
+     * 
+     * Method for sorting record list acquisition.
+     * Generate ORDER BY clause in requesting SQL.
+     * 
+     * @param String $column Sort target column name
+     * @param String $sort Specify ascending/descending order (asc/desc)
+     * @return OrmSelect $this
+     */
     public function orderBy($column, $sort){
 
         $this->_query[] = [
@@ -151,6 +161,16 @@ class OrmSelect{
         return $this;
     }
 
+    /**
+     * limit
+     * 
+     * Specify ascending/descending order
+     * Generate LIMIT clause for request SQL
+     * 
+     * @param Int $limit Record extraction limit number of records
+     * @param Int $offset Record acquisition start position
+     * @return OrmSelect $this
+     */
     public function limit($limit, $offset = null){
 
         $this->_query[] = [
@@ -162,6 +182,16 @@ class OrmSelect{
         return $this;
     }
 
+    /**
+     * join
+     * 
+     * Methods for inner joining with other tables
+     * Generate INNER JOIN clause in request SQL
+     * 
+     * @param String $tableName table name to join
+     * @param function $callback A callback that specifies the join condition
+     * @return OrmSelect $this
+     */
     public function join($tableName, $callback){
 
         $this->_query[] = [
@@ -173,16 +203,16 @@ class OrmSelect{
         return $this;
     }
 
-    public function union($ormObject){
-
-        $this->_query[] = [
-            "type" => "union",
-            "ormObject" => $ormObject,
-        ];
-
-        return $this;
-    }
-
+    /**
+     * leftJoin
+     * 
+     * Methods for outer joining with other tables.
+     * Generate LEFT JOIN clause in request SQL
+     * 
+     * @param String $tableName table name to join
+     * @param function $callback A callback that specifies the join condition
+     * @return OrmSelect $this
+     */
     public function leftJoin($tableName, $callback){
 
         $this->_query[] = [
@@ -194,6 +224,16 @@ class OrmSelect{
         return $this;
     }
 
+    /**
+     * rightJoin
+     * 
+     * Methods for outer joining with other tables.
+     * Generate RIGHT JOIN clause in request SQL
+     * 
+     * @param String $tableName table name to join
+     * @param function $callback A callback that specifies the join condition
+     * @return OrmSelect $this
+     */
     public function rightJoin($tableName, $callback){
 
         $this->_query[] = [
@@ -205,6 +245,33 @@ class OrmSelect{
         return $this;
     }
 
+    /**
+     * union
+     * 
+     * Integrate other search results
+     * Generate a UNION clause in the request SQL
+     * 
+     * @param OrmSelect $ormObject OrmSelect class object for other search criteria
+     * @return OrmSelect $this
+     */
+    public function union($ormObject){
+
+        $this->_query[] = [
+            "type" => "union",
+            "ormObject" => $ormObject,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * toSql
+     * 
+     * A method that generates a SQL statement.
+     * Automatically generate SQL statements based on search conditions specified by various method chains
+     * 
+     * @return String SQL Code
+     */
     public function toSql(){
 
         $select = "*";
@@ -338,11 +405,31 @@ class OrmSelect{
         return $sql;
     }
 
+    /**
+     * toBind
+     * 
+     * Get bound value
+     * Check the bound value in the toSQL() method here
+     * 
+     * @return Array bind data
+     */
     public function toBind(){
         return $this->_bind;
     }
 
+    /**
+     * get
+     * 
+     * Get table record information.
+     * 
+     * @param Boolean $first Flag to respond only the first record
+     * @return OrmResCollection Record acquisition result class
+     */
     public function get($first = false){
+
+        // Execute pre-record handler
+        $this->context->handleSelectBefore($this);
+
         $sql = $this->toSql();
 
         $std = $this->context->query($sql, $this->_bind);
@@ -360,9 +447,25 @@ class OrmSelect{
         // bind reset
         $this->_bind = [];
 
+        // Execute handler after record retrieval
+        $resBuff = $this->context->handleSelectAfter($res);
+        if($resBuff){
+            // Overwrite the response if there is a return value from the handler
+            $res = $resBuff;
+        }
+
         return $res;
     }
 
+    /**
+     * paginate
+     * 
+     * Record retrieval including paging results
+     * 
+     * @param Int $pageCount Number of records per page
+     * @param int $pageIndex page number to refer to
+     * @return OrmResCollection Record acquisition result class
+     */
     public function paginate($pageCount, $pageIndex){
 
         $totalCount = $this->count();
@@ -384,6 +487,13 @@ class OrmSelect{
         return $this;   
     }
 
+    /**
+     * first
+     * 
+     * Get only one record information
+     * 
+     * @return OrmResCollection Record acquisition result class
+     */
     public function first(){   
         
         $this->limit(1);
@@ -391,6 +501,13 @@ class OrmSelect{
         return $this->get(true);
     }
 
+    /**
+     * count
+     * 
+     * Output the number of acquired records
+     * 
+     * @return Int number of records
+     */
     public function count(){
         $res = $this->select(["count(*) as count"])
             ->first();
@@ -398,6 +515,15 @@ class OrmSelect{
         return $res->out()->count;
     }
 
+    /**
+     * lists
+     * 
+     * Get record results in list format
+     * 
+     * @param String $keyName Key column name
+     * @param String $valueName column name as value
+     * @return Array list data
+     */
     public function lists($keyName, $valueName){
 
         $this->select([$keyName, $valueName]);
