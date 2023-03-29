@@ -25,7 +25,6 @@ class OrmSelect{
     private $_table;
     private $_query = [];
     private $_bind = [];
-    private $_paging = null;
 
     /**
      * __construct
@@ -38,6 +37,15 @@ class OrmSelect{
     public function __construct(&$context, $tableName){
         $this->context = $context;
         $this->_table = $tableName;
+    }
+
+    /**
+     * queryReset
+     * @return OrmSelect $this
+     */
+    public function queryReset(){
+        $this->_query = [];
+        return $this;
     }
 
     /**
@@ -434,21 +442,26 @@ class OrmSelect{
 
         $std = $this->context->query($sql, $this->_bind);
         
-        $res = new OrmResCollection;
-
-        while($row = $std->fetch(PDO::FETCH_OBJ)){
-            $res->put($row, $first);
+        if($first){
+            $row = $std->fetch(PDO::FETCH_OBJ);
+            $res = new OrmResCollection($row);
         }
-
-        if($this->_paging){
-            $res->putPaging($this->_paging);
+        else{
+            $res = [];
+            while($row = $std->fetch(PDO::FETCH_OBJ)){
+                $res[] = new OrmResCollection($row);
+            }
         }
 
         // bind reset
         $this->_bind = [];
 
+        // query reset
+        $this->queryReset();
+
         // Execute handler after record retrieval
         $resBuff = $this->context->handleSelectAfter($res);
+
         if($resBuff){
             // Overwrite the response if there is a return value from the handler
             $res = $resBuff;
@@ -463,28 +476,20 @@ class OrmSelect{
      * Record retrieval including paging results
      * 
      * @param Int $pageCount Number of records per page
-     * @param int $pageIndex page number to refer to
+     * @param Int $pageIndex page number to refer to
      * @return OrmResCollection Record acquisition result class
      */
     public function paginate($pageCount, $pageIndex){
 
         $totalCount = $this->count();
 
-        $this->_deleteLastQuery();
-        $this->_deleteLastQuery();
-
         $this->limit($pageCount, $pageCount * ($pageIndex - 1));
 
-        $res = $this->get();
+        $buff = $this->get();
 
-        $res->putTotalPage(ceil($totalCount/$pageCount));
+        $res = new OrmResPaginate($buff, $totalCount, $pageCount);
 
         return $res;
-    }
-
-    private function _deleteLastQuery(){
-        unset($this->_query[count($this->_query)-1]);
-        return $this;   
     }
 
     /**
@@ -495,9 +500,7 @@ class OrmSelect{
      * @return OrmResCollection Record acquisition result class
      */
     public function first(){   
-        
         $this->limit(1);
-
         return $this->get(true);
     }
 
@@ -509,10 +512,11 @@ class OrmSelect{
      * @return Int number of records
      */
     public function count(){
-        $res = $this->select(["count(*) as count"])
-            ->first();
-
-        return $res->out()->count;
+        $res = $this
+            ->select(["count(*) as count"])
+            ->first()
+        ;
+        return $res->count;
     }
 
     /**
@@ -528,10 +532,9 @@ class OrmSelect{
 
         $this->select([$keyName, $valueName]);
 
-        $buffer = $this->get()->out();
+        $buffer = $this->get();
 
         $res = [];
-
         foreach($buffer as $b_){
             $res[$b_->{$keyName}] = $b_->{$valueName};
         }

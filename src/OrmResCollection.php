@@ -20,32 +20,35 @@ namespace Reald\Orm;
 
 class OrmResCollection{
 
-    protected $_buffer = [];
-    protected $_pageTotal = null;
+    private $_buffer;
 
     /**
-     * put
+     * __construct
      * 
-     * @param $data
-     * @param $firsted
+     * @param stdClass $data
      */
-    public function put($data, $firsted = false){
-        if($firsted){
-            $this->_buffer = $data;
-        }
-        else{
-            $this->_buffer[] = $data;
-        }
-        return $this;
+    public function __construct($data){
+        $this->_buffer = $data;
     }
 
     /**
-     * putTotalPage
+     * __get
      * 
-     * @param $totalPath
+     * @param String $name
      */
-    public function putTotalPage($totalPage){
-        $this->_pageTotal = $totalPage;
+    public function __get($name){
+        if(!empty($this->_buffer->{$name})){
+            return $this->_buffer->{$name};
+        }
+    }
+
+    /**
+     * __set
+     * 
+     * @param String $name
+     */
+    public function __set($name, $value){
+        $this->_buffer->{$name} = $value;
     }
 
     /**
@@ -57,27 +60,5 @@ class OrmResCollection{
      */
     public function toArray(){
         return (array)$this->_buffer;
-    }
-
-    /**
-     * out
-     * 
-     * Output the record acquisition result as it is.
-     * 
-     * @return StdClass
-     */
-    public function out($name = null){
-        return $this->_buffer;
-    }
-
-    /**
-     * getTotalPage
-     * 
-     * Get total number of pages.
-     * 
-     * @return int
-     */
-    public function getTotalPage(){
-        return $this->_pageTotal;
     }
 }
