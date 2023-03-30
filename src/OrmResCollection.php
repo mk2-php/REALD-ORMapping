@@ -37,7 +37,7 @@ class OrmResCollection{
      * @param String $name
      */
     public function __get($name){
-        if(!empty($this->_buffer->{$name})){
+        if(isset($this->_buffer->{$name})){
             return $this->_buffer->{$name};
         }
     }
@@ -59,6 +59,8 @@ class OrmResCollection{
      * @return Array
      */
     public function toArray(){
-        return (array)$this->_buffer;
+        if($this->_buffer){
+            return (array)$this->_buffer;
+        }
     }
 }

@@ -17,16 +17,14 @@
  */
 namespace Reald\Orm;
 
-use Reald\Core\CoreBlock;
 use Reald\Core\Config;
 
-class Table extends CoreBlock{
+class Table{
 
     // Horizontal deployment from OrmTrait
     use OrmTrait;
     
     public function __construct(){
-        parent::__construct();
 
         if(!$this->existDriver()){
             $getDrive = Config::get("config.database.". $this->drive);
