@@ -114,6 +114,6 @@ class OrmInsert{
      * @return int last insertID
      */
     public function lastInsertId(){
-        return $this->context->_pdo->lastInsertId();
+        return $this->context->getConnect()->lastInsertId();
     }
 }

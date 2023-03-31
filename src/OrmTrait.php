@@ -26,6 +26,7 @@ require_once "OrmMigrateTable.php";
 require_once "OrmMigrateView.php";
 require_once "OrmInsert.php";
 require_once "OrmUpdate.php";
+require_once "OrmDelete.php";
 require_once "OrmResCollection.php";
 
 use PDO;
@@ -115,6 +116,15 @@ trait OrmTrait{
             $res[] = $row;
         }
         return $res;
+    }
+
+    /**
+     * getConnect
+     * 
+     * @return PDO Pdo Object
+     */
+    public function getConnect(){
+        return ORMStatic::getConnect($this->drive);
     }
 
     /**
@@ -226,6 +236,18 @@ trait OrmTrait{
     }
 
     /**
+     * delete
+     * 
+     * Method for deleting record information
+     * Returns OrmDelete class object as return value
+     * @return OrmDelete OrmDelete Class Object
+     */
+    public function delete(){
+        $ormDelete = new OrmDelete($this, $this->tableName);
+        return $ormDelete;
+    }
+
+    /**
      * begin
      * 
      * Start a transaction.
@@ -288,8 +310,6 @@ trait OrmTrait{
     /**
      * handleInsertBefore
      * 
-     * 
-     * 
      * @param Array $insertData insert data
      * @return void
      */
@@ -315,10 +335,25 @@ trait OrmTrait{
     /**
      * handleUpdateAfter
      * 
-     * 
      * @param OrmUpdate OrmUpdate Class Object
      * @return void
      */
     public function handleUpdateAfter($std){}
+
+    /**
+     * handleDeleteBefore
+     * 
+     * @param OrmDelete OrmDelete Class Object
+     * @return void
+     */
+    public function handleDeleteBefore($std){}
+
+    /**
+     * handleDeleteAfter
+     * 
+     * @param OrmDelete OrmDelete Class Object
+     * @return void
+     */
+    public function handleDeleteAfter($std){}
 
 }

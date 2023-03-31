@@ -160,4 +160,5 @@ class OrmStatic{
     public static function log(){
         return self::$_log;
     }
+
 }
