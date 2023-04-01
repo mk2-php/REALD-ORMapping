@@ -72,6 +72,17 @@ class OrmSelect{
         return $this;
     }
 
+    public function wherePriority($callback, $join = "AND"){
+
+        $this->_query[] = [
+            "type"=>"wherepriority",
+            "callback" => $callback,
+            "join"=>$join,
+        ];
+
+        return $this;
+    }
+
     /**
      * whereRaw
      * 
@@ -122,6 +133,18 @@ class OrmSelect{
 
         $this->_query[] = [
             "type"=>"wherein",
+            "column"=>$column,
+            "values"=>$values,
+            "join"=>$join,
+        ];
+
+        return $this;
+    }
+
+    public function whereNotIn($column, $values, $join = "AND"){
+
+        $this->_query[] = [
+            "type"=>"wherenotin",
             "column"=>$column,
             "values"=>$values,
             "join"=>$join,
@@ -321,7 +344,7 @@ class OrmSelect{
 
                 $where .= $q_["raw"];
             }
-            else if($q_["type"] == "wherein"){
+            else if($q_["type"] == "wherein" || $q_["type"] == "wherenotin"){
 
                 if($where != ""){
                     $where .= " " . $q_["join"] . " ";
@@ -336,7 +359,29 @@ class OrmSelect{
                     $this->_bind[] = $q_["values"][$ind];
                 }
 
-                $where .= $q_["column"] . " IN (" . $valueStr . ")";
+                if($q_["type"] == "wherein"){
+                    $where .= $q_["column"] . " IN (" . $valueStr . ")";
+                }
+                else{
+                    $where .= $q_["column"] . " NOT IN (" . $valueStr . ")";
+                }
+            }
+            else if($q_["type"] == "wherepriority"){
+                
+                if($where != ""){
+                    $where .= " " . $q_["join"] . " ";
+                }
+
+                $joinSelect = new OrmSelectJoin;
+                $q_["callback"]($joinSelect);
+
+                $where .= " ( " . $joinSelect->toSql() . ")";
+
+                $_bind = $joinSelect->toBind();
+
+                foreach($_bind as $b_){
+                    $this->_bind[] = $b_;
+                }
             }
             else if($q_["type"] == "orderby"){
                 if($orderby){
@@ -528,15 +573,25 @@ class OrmSelect{
      * @param String $valueName column name as value
      * @return Array list data
      */
-    public function lists($keyName, $valueName){
+    public function lists($keyName, $valueName = null){
 
-        $this->select([$keyName, $valueName]);
+        if($valueName){
+            $this->select([$keyName, $valueName]);
+        }
+        else{
+            $this->select([$keyName]);
+        }
 
         $buffer = $this->get();
 
         $res = [];
         foreach($buffer as $b_){
-            $res[$b_->{$keyName}] = $b_->{$valueName};
+            if($valueName){
+                $res[$b_->{$keyName}] = $b_->{$valueName};
+            }
+            else{
+                $res[] = $b_->{$keyName};
+            }
         }
 
         return $res;
@@ -591,6 +646,18 @@ class OrmSelectJoin{
         return $this;
     }
 
+    public function whereNotIn($column, $values, $join = "AND"){
+
+        $this->_query[] = [
+            "type"=>"wherenotin",
+            "column"=>$column,
+            "values"=>$values,
+            "join"=>$join,
+        ];
+
+        return $this;
+    }
+
     public function toSql(){
 
         $where = "";
@@ -613,7 +680,7 @@ class OrmSelectJoin{
                     $this->_bind[] = $q_["value"];
                 }
             }
-            else if($q_["type"] == "wherein"){
+            else if($q_["type"] == "wherein" || $q_["type"] == "wherenotin"){
 
                 if($where != ""){
                     $where .= " " . $q_["join"] . " ";
@@ -628,8 +695,14 @@ class OrmSelectJoin{
                     $this->_bind[] = $q_["values"][$ind];
                 }
 
-                $where .= $q_["column"] . " IN (" . $valueStr . ")";
+                if($q_["type"] == "wherein"){
+                    $where .= $q_["column"] . " IN (" . $valueStr . ")";
+                }
+                else{
+                    $where .= $q_["column"] . " NOT IN (" . $valueStr . ")";
+                }
             }
+            
         }
 
         return $where;
