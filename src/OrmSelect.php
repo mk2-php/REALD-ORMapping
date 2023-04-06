@@ -478,7 +478,7 @@ class OrmSelect{
      * @param Boolean $first Flag to respond only the first record
      * @return OrmResCollection Record acquisition result class
      */
-    public function get($first = false){
+    public function get($first = false, $arraied = false){
 
         // Execute pre-record handler
         $this->context->handleSelectBefore($this);
@@ -487,15 +487,23 @@ class OrmSelect{
 
         $std = $this->context->query($sql, $this->_bind);
         
-        if($first){
-            $row = $std->fetch(PDO::FETCH_OBJ);
-            $res = new OrmResCollection($row);
+        if($arraied){
+            $res = [];
+            while($row = $std->fetch(PDO::FETCH_ASSOC)){
+                $res[] = $row;
+            }
         }
         else{
-            $res = [];
-            while($row = $std->fetch(PDO::FETCH_OBJ)){
-                $res[] = new OrmResCollection($row);
+            if($first){
+                $row = $std->fetch(PDO::FETCH_OBJ);
+                $res = new OrmResCollection($row);
             }
+            else{
+                $res = [];
+                while($row = $std->fetch(PDO::FETCH_OBJ)){
+                    $res[] = new OrmResCollection($row);
+                }
+            }    
         }
 
         // bind reset
@@ -513,6 +521,24 @@ class OrmSelect{
         }
 
         return $res;
+    }
+
+    /**
+     * getArray
+     * 
+     * @return OrmResCollection 
+     */
+    public function getArray(){
+        return $this->get(false, true);
+    }
+
+    /**
+     * firstArray
+     * 
+     * @return OrmResCollection 
+     */
+    public function firstArray(){
+        return $this->get(true, true);
     }
 
     /**
@@ -656,6 +682,10 @@ class OrmSelectJoin{
         ];
 
         return $this;
+    }
+    
+    public function whereInNot($column, $values, $join = "AND"){
+        return $this->whereNotIn($column, $values, $join);
     }
 
     public function toSql(){
