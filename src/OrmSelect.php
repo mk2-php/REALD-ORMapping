@@ -351,13 +351,18 @@ class OrmSelect{
                 }
 
                 $valueStr = "";
-                for($ind = 0 ; $ind < count($q_["values"]) ; $ind++){
+                $ind = 0;
+                foreach($q_["values"] as $key => $val){
                     if($ind){
                         $valueStr .= ",";
                     }
+
                     $valueStr .= "?";
-                    $this->_bind[] = $q_["values"][$ind];
+                    $this->_bind[] = $val;
+                    
+                    $ind++;
                 }
+
 
                 if($q_["type"] == "wherein"){
                     $where .= $q_["column"] . " IN (" . $valueStr . ")";
